@@ -1,5 +1,7 @@
 const express = require("express");
 const Auth = require("./middleware/Auth")
+const connectDB = require("./database/connection");
+const User = require("./models/User")
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,4 +23,21 @@ app.use("/",(err,req,res,next)=>{
         res.status(500).send("something went wrong")
     }
 })
-app.listen(2500);
+app.post("/user",async(req,res)=>{
+    const userdata = req.body
+    const user = new User(userdata)
+    try {
+        await user.save()
+        res.send("user inserted")
+    } catch (error) {
+        res.status(500).send(error)
+    }
+    
+
+})
+connectDB().then(()=>{
+    console.log("connectDB")
+    app.listen(2500)
+}).catch((err)=>{
+    console.log(err)
+})
